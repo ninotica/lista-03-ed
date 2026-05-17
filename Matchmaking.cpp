@@ -1,18 +1,15 @@
 #include "Matchmaking.hpp"
-#include <iostream>
-#include <string>
 
 Matchmaking::Matchmaking() {
-
+    size = 0;
 }
 Matchmaking::~Matchmaking() {
-
 }
 
 bool Matchmaking::insert(Player player) {
-// deve inserir o jogador no final do array.
-// Caso exista espaço disponível, o jogador deve ser inserido e o método deve retornar true.
-// Caso não exista espaço disponível, o método deve retornar false.
+    // deve inserir o jogador no final do array.
+    // Caso exista espaço disponível, o jogador deve ser inserido e o método deve retornar true.
+    // Caso não exista espaço disponível, o método deve retornar false.
     if (size < MAX_PLAYERS){
         players[size] = player;
         size++;
@@ -57,17 +54,46 @@ void Matchmaking::sortByScoreMerge() {
 
 
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
+    int m;
+    Player* w_players = getWaitingPlayers(&m);
+    if (m <= groupSize) {
+        delete[] w_players;
+        *n = 0;
+        return nullptr;
+    }
 
+    for (int i = 0; i <= m - groupSize; i++) {
+        if (w_players[i + groupSize - 1].getScore() - w_players[i].getScore() > delta) continue;
+        else {
+            Player* group = new Player[groupSize];
+            for (int j = 0; j < groupSize; j++) {
+                group[j] = w_players[i + j];
+                removePlayer(w_players[i + j].getId());
+            }
+
+            delete[] w_players;
+            *n = groupSize;
+            return group;
+        }
+    }
+
+    delete[] w_players;
+    *n = 0;
+    return nullptr;
 }
 
 Player* Matchmaking::getWaitingPlayers(int* n) {
-
+    *n = size;
+    Player* w_players = new Player[*n];
+    for (int i = 0; i < *n; i++) {
+        w_players[i] = players[i];
+    }
+    return w_players;
 }
 
 void Matchmaking::printWaitingPlayers() {
 
 }
-
 
 // Player* merge(Player arr1[], int n, Player arr2[], int m){
 //     Player* arr_new = new Player[m+n];
@@ -113,7 +139,6 @@ void Matchmaking::printWaitingPlayers() {
 
 //     return sorted;
 // }
-// Outros métodos auxiliares, se necessário
 
 void merge(Player arr[], int left, int mid, int right){
     Player* arr_new = new Player[right-left+1];
