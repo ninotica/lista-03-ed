@@ -54,41 +54,49 @@ void Matchmaking::sortByScoreMerge() {
 
 
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
+// Group:
+// [id | nome | score | timestamp]
     int m;
-    Player* w_players = getWaitingPlayers(&m);
+    Player* waiting = getWaitingPlayers(&m);
     if (m <= groupSize) {
-        delete[] w_players;
+        delete[] waiting;
+        std::cout << "Group:" << std::endl;
+        std::cout << "(empty)" << std::endl;
         *n = 0;
         return nullptr;
     }
 
     for (int i = 0; i <= m - groupSize; i++) {
-        if (w_players[i + groupSize - 1].getScore() - w_players[i].getScore() > delta) continue;
+        if (waiting[i + groupSize - 1].getScore() - waiting[i].getScore() > delta) continue;
         else {
             Player* group = new Player[groupSize];
+            std::cout << "Group:" << std::endl;
             for (int j = 0; j < groupSize; j++) {
-                group[j] = w_players[i + j];
-                removePlayer(w_players[i + j].getId());
+                group[j] = waiting[i + j];
+                removePlayer(waiting[i + j].getId());
+                std::cout << "[" << group[j].getId() << " | " << group[j].getName() << " | " << group[j].getScore() << " | " << group[j].getTimestamp() << "]" << std::endl;
             }
 
-            delete[] w_players;
+            delete[] waiting;
             *n = groupSize;
             return group;
         }
     }
 
-    delete[] w_players;
+    delete[] waiting;
+    std::cout << "Group:" << std::endl;
+    std::cout << "(empty)" << std::endl;
     *n = 0;
     return nullptr;
 }
 
 Player* Matchmaking::getWaitingPlayers(int* n) {
     *n = size;
-    Player* w_players = new Player[*n];
+    Player* waiting = new Player[*n];
     for (int i = 0; i < *n; i++) {
-        w_players[i] = players[i];
+        waiting[i] = players[i];
     }
-    return w_players;
+    return waiting;
 }
 
 void Matchmaking::printWaitingPlayers() {
@@ -98,8 +106,8 @@ void Matchmaking::printWaitingPlayers() {
     Player* waiting = getWaitingPlayers(&n);
     
     std::cout << "Waiting Players:" << std::endl;
-    if (n==0){
-        std::cout << "empty" << std::endl;
+    if (n == 0){
+        std::cout << "(empty)" << std::endl;
     }
     for (int i = 0; i<n; i++){
 
