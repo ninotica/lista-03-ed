@@ -92,7 +92,22 @@ Player* Matchmaking::getWaitingPlayers(int* n) {
 }
 
 void Matchmaking::printWaitingPlayers() {
+// Waiting Players:
+// [id | nome | score | timestamp]
+    int n;
+    Player* waiting = getWaitingPlayers(&n);
+    
+    std::cout << "Waiting Players:" << std::endl;
+    if (n==0){
+        std::cout << "empty" << std::endl;
+    }
+    for (int i = 0; i<n; i++){
 
+        std::cout << "[" << waiting[i].getId() << " | " << waiting[i].getName() << " | " << waiting[i].getScore() << " | " << waiting[i].getTimestamp() << "]" << std::endl;
+    }
+
+    delete[] waiting;
+    return;
 }
 
 // Player* merge(Player arr1[], int n, Player arr2[], int m){
