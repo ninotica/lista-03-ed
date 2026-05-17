@@ -31,4 +31,8 @@ public:
     // Outros métodos auxiliares, se necessário
 };
 
+Player* mergeSort(Player arr[], int n);
+Player* merge(Player arr1[], int n, Player arr2[], int m);
+
+
 #endif
