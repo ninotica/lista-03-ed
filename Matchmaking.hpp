@@ -31,7 +31,7 @@ public:
     // Outros métodos auxiliares, se necessário
 };
 
-Player* mergeSort(Player arr[], int n);
-Player* merge(Player arr1[], int n, Player arr2[], int m);
+void mergeSort(Player arr[], int left, int right);
+void merge(Player arr[], int left, int mid, int right);
 
 #endif

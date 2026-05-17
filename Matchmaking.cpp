@@ -92,8 +92,6 @@ Player* Matchmaking::getWaitingPlayers(int* n) {
 }
 
 void Matchmaking::printWaitingPlayers() {
-// Waiting Players:
-// [id | nome | score | timestamp]
     int n;
     Player* waiting = getWaitingPlayers(&n);
     
