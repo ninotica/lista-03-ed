@@ -54,8 +54,6 @@ void Matchmaking::sortByScoreMerge() {
 
 
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
-// Group:
-// [id | nome | score | timestamp]
     int m;
     Player* waiting = getWaitingPlayers(&m);
     if (m <= groupSize) {
@@ -100,8 +98,6 @@ Player* Matchmaking::getWaitingPlayers(int* n) {
 }
 
 void Matchmaking::printWaitingPlayers() {
-// Waiting Players:
-// [id | nome | score | timestamp]
     int n;
     Player* waiting = getWaitingPlayers(&n);
     
