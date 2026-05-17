@@ -2,7 +2,7 @@
 #ifndef MATCHMAKING_HPP
 #define MATCHMAKING_HPP
 
-const int MAX_PLAYERS = 100000;
+const int MAX_PLAYERS = 1000;
 
 class Matchmaking {
 

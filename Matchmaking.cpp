@@ -18,20 +18,17 @@ bool Matchmaking::insert(Player player) {
     return false;
 }
 bool Matchmaking::removePlayer(int id) {
-// deve remover da fila o jogador com o identificador informado.
-// O método deve retornar:
-// true, caso o jogador seja encontrado e removido;
-// false, caso nenhum jogador com o ID informado seja encontrado.
 
     int current = 0;
-    while (current < MAX_PLAYERS) {
+    while (current < size) {
         if (players[current].getId() == id){
-            for (int i = current; i < size; i++){
+            for (int i = current; i < size - 1; i++){
                 players[i] = players[i+1];
             }
             size--;
             return true;
         }
+        current++;
     }
     return false;
 }
