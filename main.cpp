@@ -1,70 +1,101 @@
 #include <chrono>
+#include <cstdlib>
 #include "Matchmaking.hpp"
 
-int pseudorandom (int i) {
-    return (373*i + 863)%2000;
-}
-
 int main() {
-    Matchmaking matchmaking = Matchmaking();
+    Matchmaking* matchmaking = new Matchmaking();
 
-    Player Trajano(1, "Trajano", 1000, 2);
-    Player Nina(2, "Nina", 1100, 3);
-    Player Boldrini(3, "Boldrini", 900, 1);
+    Player Trajano(1, "Trajano", 1000, 3);
+    Player Nina(2, "Nina", 1100, 1);
+    Player Boldrini(3, "Boldrini", 900, 2);
     Player Yuri(4, "Yuri", 1150, 4);
     Player Larissa(5, "Larissa", 1000, 6);
     Player Lisa(6, "Lisa", 1150, 5);
 
-    matchmaking.insert(Boldrini);
-    matchmaking.insert(Trajano);
-    matchmaking.insert(Nina);
-    
-    matchmaking.printWaitingPlayers();
-    
-    matchmaking.sortByScoreInsertion();
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||           INSERCAO DE JOGADORES           ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
 
-    matchmaking.printWaitingPlayers();
+    matchmaking->insert(Nina);
+    matchmaking->insert(Boldrini);
+    matchmaking->insert(Trajano);
 
-    matchmaking.insert(Yuri);
-    matchmaking.insert(Larissa);
-    matchmaking.insert(Lisa);
+    matchmaking->printWaitingPlayers();
 
-    matchmaking.printWaitingPlayers();
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||            INSERTION SORT                 ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
 
-    matchmaking.sortByScoreMerge();
+    matchmaking->sortByScoreInsertion();
+    matchmaking->printWaitingPlayers();
 
-    matchmaking.printWaitingPlayers();
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||       INSERCAO DE MAIS JOGADORES          ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
+
+    matchmaking->insert(Yuri);
+    matchmaking->insert(Larissa);
+    matchmaking->insert(Lisa);
+
+    matchmaking->printWaitingPlayers();
+
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||              MERGE SORT                   ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
+
+    matchmaking->sortByScoreMerge();
+    matchmaking->printWaitingPlayers();
+
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||           FORMACAO DE GRUPO               ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
 
     int n;
-    matchmaking.formGroup(3, 200, &n);
+    Player* group = matchmaking->formGroup(3, 200, &n);
+    delete[] group;
 
-    matchmaking.printWaitingPlayers();
+    matchmaking->printWaitingPlayers();
 
-    matchmaking.removePlayer(4);
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||           REMOCAO DE JOGADOR              ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
 
-    matchmaking.printWaitingPlayers();
+    matchmaking->removePlayer(4);
+    matchmaking->printWaitingPlayers();
 
-    matchmaking.formGroup(3, 100, &n);
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||      FALHA NA FORMACAO DE GRUPO           ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
 
+    matchmaking->formGroup(3, 100, &n);
+
+    std::cout << "===============================================" << std::endl;
+    std::cout << "||          GETWAITINGPLAYERS                ||" << std::endl;
+    std::cout << "===============================================" << std::endl;
+
+    int m;
+    Player* players = matchmaking->getWaitingPlayers(&m);
+    std::cout << "Jogadores na fila: " << m << std::endl;
+    delete[] players;
 
     std::cout << "===============================================" << std::endl;
     std::cout << "||             TESTES DE TEMPO               ||" << std::endl;
     std::cout << "===============================================" << std::endl;
 
-    Matchmaking matchA = Matchmaking();
-    Matchmaking matchB = Matchmaking();
+    Matchmaking* matchA = new Matchmaking();
+    Matchmaking* matchB = new Matchmaking();
 
+    srand(42);
 
-
-    for (int i = 1; i <=300; i++){
-        int score = pseudorandom(i);
-        matchA.insert(Player(i, "irineu", score, i));
-        matchB.insert(Player(i, "irineu", score, i));
-    };
+    for (int i = 1; i <= 10000; i++){
+        int score = rand() % 100000;
+        matchA->insert(Player(i, "irineu", score, i));
+        matchB->insert(Player(i, "irineu", score, i));
+    }
 
     auto start_i = std::chrono::high_resolution_clock::now();
 
-    matchA.sortByScoreInsertion();
+    matchA->sortByScoreInsertion();
 
     auto end_i = std::chrono::high_resolution_clock::now();
 
@@ -72,7 +103,7 @@ int main() {
 
     auto start_m = std::chrono::high_resolution_clock::now();
 
-    matchB.sortByScoreMerge();
+    matchB->sortByScoreMerge();
 
     auto end_m = std::chrono::high_resolution_clock::now();
 
@@ -83,15 +114,3 @@ int main() {
     
     return 0;
 }
-
-// Criar um main.cpp contendo casos de teste que demonstrem:
-
-// inserção de jogadores;
-// remoção de jogadores;
-// ordenação utilizando insertion sort;
-// ordenação utilizando merge sort;
-// ordenação com empate de score;
-// formação bem-sucedida de grupo;
-// tentativa de formação de grupo sem sucesso;
-// recuperação dos dados por meio do método getWaitingPlayers;
-// exibição do estado do sistema.

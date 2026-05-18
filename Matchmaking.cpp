@@ -7,9 +7,8 @@ Matchmaking::~Matchmaking() {
 }
 
 bool Matchmaking::insert(Player player) {
-    // deve inserir o jogador no final do array.
-    // Caso exista espaço disponível, o jogador deve ser inserido e o método deve retornar true.
-    // Caso não exista espaço disponível, o método deve retornar false.
+    // Insere no final do array e incrementa size.
+    // Retorna false se a fila já estiver cheia.
     if (size < MAX_PLAYERS){
         players[size] = player;
         size++;
@@ -18,12 +17,14 @@ bool Matchmaking::insert(Player player) {
     return false;
 }
 bool Matchmaking::removePlayer(int id) {
-
+    // Busca linear pelo ID. Ao encontrar, desloca todos os elementos
+    // seguintes uma posição à esquerda para preencher o espaço,
+    // mantendo a ordem atual do array.
     int current = 0;
     while (current < size) {
         if (players[current].getId() == id){
             for (int i = current; i < size - 1; i++){
-                players[i] = players[i+1];
+                players[i] = players[i + 1];
             }
             size--;
             return true;
@@ -34,10 +35,15 @@ bool Matchmaking::removePlayer(int id) {
 }
 
 void Matchmaking::sortByScoreInsertion() {
-    for (int i = 1; i < size; i++){
+    // Para cada elemento a partir do índice 1, desloca para a direita
+    // todos os anteriores com score maior, inserindo o atual na posição correta.
+    // Por só deslocar elementos maiores, a ordem relativa entre scores iguais
+    // é preservada — o algoritmo é estável, garantindo desempate por timestamp.
+
+    for (int i = 1; i < size; i++) {
         Player current = players[i];
         int j = i -1;
-        while(j >=0 && players[j].getScore() < current.getScore()){
+        while (j >= 0 && players[j].getScore() > current.getScore()) {
             players[j + 1] = players[j];
             j--;
         }
@@ -53,7 +59,8 @@ void Matchmaking::sortByScoreMerge() {
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
     int m;
     Player* waiting = getWaitingPlayers(&m);
-    if (m <= groupSize) {
+    // Sem jogadores suficientes para formar um grupo.
+    if (m < groupSize) {
         delete[] waiting;
         std::cout << "Group:" << std::endl;
         std::cout << "(empty)" << std::endl;
@@ -61,6 +68,9 @@ Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
         return nullptr;
     }
 
+    // Com o array ordenado por score, a diferença máxima de qualquer janela
+    // de groupSize posições consecutivas é sempre waiting[i+groupSize-1] - waiting[i].
+    // Basta uma varredura linear para encontrar a primeira janela válida.
     for (int i = 0; i <= m - groupSize; i++) {
         if (waiting[i + groupSize - 1].getScore() - waiting[i].getScore() > delta) continue;
         else {
@@ -78,6 +88,7 @@ Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
         }
     }
 
+    // Nenhuma janela válida encontrada; fila permanece inalterada.
     delete[] waiting;
     std::cout << "Group:" << std::endl;
     std::cout << "(empty)" << std::endl;
@@ -86,6 +97,7 @@ Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
 }
 
 Player* Matchmaking::getWaitingPlayers(int* n) {
+    // Retorna cópia dinâmica do array interno. Chamador é responsável por delete[].
     *n = size;
     Player* waiting = new Player[*n];
     for (int i = 0; i < *n; i++) {
@@ -102,7 +114,7 @@ void Matchmaking::printWaitingPlayers() {
     if (n == 0){
         std::cout << "(empty)" << std::endl;
     }
-    for (int i = 0; i<n; i++){
+    for (int i = 0; i < n; i++) {
 
         std::cout << "[" << waiting[i].getId() << " | " << waiting[i].getName() << " | " << waiting[i].getScore() << " | " << waiting[i].getTimestamp() << "]" << std::endl;
     }
@@ -111,91 +123,47 @@ void Matchmaking::printWaitingPlayers() {
     return;
 }
 
-// Player* merge(Player arr1[], int n, Player arr2[], int m){
-//     Player* arr_new = new Player[m+n];
-//     int idx1 = 0;
-//     int idx2 = 0;
-//     for (int i = 0; i < m+n; i++){
-//         if (idx1 >= n){
-//             arr_new[i] = arr2[idx2];
-//             idx2++;
-//         } else if (idx2 >= m){
-//             arr_new[i] = arr1[idx1];
-//             idx1++;
-//         } else {
-//             if (arr1[idx1].getScore() <= arr2[idx2].getScore()){
-//                 arr_new[i] = arr1[idx1];
-//                 idx1++;
-//             } else {
-//                 arr_new[i] = arr2[idx2];
-//                 idx2++;
-//             }
-//         }
-//     }
-//     return arr_new;
-// }
-
-
-// Player* mergeSort(Player arr[], int n) {
-//     if (n == 1){
-//         Player unit[1];
-//         unit[0] = arr[0];
-//         return unit;
-//     }
-
-//     int mid = n/2;
-
-//     Player* left = mergeSort(arr, mid);
-//     Player* right = mergeSort(arr + mid, n-mid);
-
-//     Player* sorted = merge(left, mid, right, n-mid);
-
-//     delete[] left;
-//     delete[] right;
-
-//     return sorted;
-// }
-
 void merge(Player arr[], int left, int mid, int right){
-    Player* arr_new = new Player[right-left+1];
+    // Copia o intervalo arr[left..right] para um buffer auxiliar,
+    // depois intercala as duas metades de volta ao array original em ordem crescente.
+    Player* arr_new = new Player[right - left + 1];
     for (int i = left; i <= right; i++){
-        arr_new[i-left] = arr[i];
+        arr_new[i - left] = arr[i];
     }
     int idx1 = left;
     int idx2 = mid + 1;
     for (int i = left; i <= right; i++){
-        if (idx1 > mid){
+        if (idx1 > mid) {                       // Metade esquerda esgotada.
             arr[i] = arr_new[idx2 - left];
             idx2++;
-        } else if (idx2 > right){
+        } else if (idx2 > right) {              // Metade direita esgotada.
             arr[i] = arr_new[idx1 - left];
             idx1++;
+        } else if (arr_new[idx1 - left].getScore() < arr_new[idx2 - left].getScore() ||
+            (arr_new[idx1 - left].getScore() == arr_new[idx2 - left].getScore() &&
+            arr_new[idx1 - left].getTimestamp() <= arr_new[idx2 - left].getTimestamp())) {
+            arr[i] = arr_new[idx1 - left];      // Elemento da esquerda é menor ou igual.
+            idx1++;
         } else {
-            if (arr_new[idx1 - left].getScore() <= arr_new[idx2 - left].getScore()){
-                arr[i] = arr_new[idx1 - left];
-                idx1++;
-            } else {
-                arr[i] = arr_new[idx2 - left];
+                arr[i] = arr_new[idx2 - left];  // Elemento da direita é menor.
                 idx2++;
-            }
         }
     }
     delete[] arr_new;
     return;
 }
 
-
 void mergeSort(Player arr[], int left, int right) {
-    if (left>=right){
+    // Caso base: subarray de 0 ou 1 elemento já está ordenado.
+    if (left >= right){
         return;
     }
 
-    int mid = (left+right)/2;
+    int mid = (left + right) / 2;
 
-    mergeSort(arr, left, mid);
-    mergeSort(arr, mid+1, right);
-
-    merge(arr, left, mid, right);
+    mergeSort(arr, left, mid);                  // Ordena metade esquerda.
+    mergeSort(arr, mid + 1, right);             // Ordena metade direita.
+    merge(arr, left, mid, right);               // Combina as duas metades.
 
     return;
 }

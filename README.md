@@ -32,7 +32,7 @@ matchmaking/
 ```
 
 - **`Player.hpp` / `Player.cpp`**: define a estrutura de um jogador e seus métodos de acesso (`getId`, `getName`, `getScore`, `getTimestamp`).
-- **`Matchmaking.hpp` / `Matchmaking.cpp`**: contém a lógica central do sistema — armazenamento em array estático de tamanho `MAX_PLAYERS` (1000), inserção, remoção, dois algoritmos de ordenação e formação de grupos. As funções auxiliares `mergeSort` e `merge` são declaradas no `.hpp` e implementadas no `.cpp`.
+- **`Matchmaking.hpp` / `Matchmaking.cpp`**: contém a lógica central do sistema — armazenamento em array estático de tamanho `MAX_PLAYERS` (100.000), inserção, remoção, dois algoritmos de ordenação e formação de grupos. As funções auxiliares `mergeSort` e `merge` são declaradas no `.hpp` e implementadas no `.cpp`.
 - **`main.cpp`**: arquivo principal com todos os casos de teste.
 
 ---
@@ -83,6 +83,8 @@ O `main.cpp` cobre os seguintes cenários, executados em sequência ao rodar o p
 
 7. **Tentativa de formação de grupo sem sucesso** — chama `formGroup(3, 100, &n)` com um delta mais restrito, esperando que nenhum grupo seja encontrado (saída `(empty)`).
 
-8. **Testes de desempenho** — insere 300 jogadores com scores pseudoaleatórios em dois objetos `Matchmaking` separados e mede o tempo de execução do insertion sort e do merge sort usando `<chrono>`, exibindo os resultados em milissegundos.
+8. **Recuperação dos jogadores** — chama `getWaitingPlayers` e exibe a quantidade de jogadores atualmente na fila.
+
+9. **Testes de desempenho** — insere jogadores com scores aleatórios (semente fixa `srand(42)`) em dois objetos `Matchmaking` alocados no heap e mede o tempo de execução do insertion sort e do merge sort usando `<chrono>`, exibindo os resultados em milissegundos.
 
 A saída completa do programa permite verificar cada etapa visualmente, com o estado da fila exibido antes e depois de cada operação.
